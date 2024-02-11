@@ -19,19 +19,25 @@ import { TypeAndLabel } from "./modalValidation";
 interface CustomProps {
   openAddModal: boolean;
   setOpenAddModal: any;
-  getLocalPrevData: boolean;
-  setGetLocalPrevData: any;
   allFormData?: any;
-  setAllFormData?: any;
+  viewModalData?: any;
+  setViewModalData?: any;
+  editModalData?: any;
+  setEditModalData?: any;
+  viewDataIndex?: any;
+  setViewDataIndex?: any;
 }
 
 const AddModal = ({
   openAddModal,
   setOpenAddModal,
-  getLocalPrevData,
-  setGetLocalPrevData,
   allFormData,
-  setAllFormData,
+  editModalData,
+  setEditModalData,
+  viewModalData,
+  setViewModalData,
+  viewDataIndex,
+  setViewDataIndex,
 }: CustomProps) => {
   const classes = ModalStyle;
   const [typeAndLabelValue, setTypeAndLabelValue] = useState<TypeAndLabel>({
@@ -39,28 +45,15 @@ const AddModal = ({
     label: "",
   });
   const [formData, setFormData] = useState<TypeAndLabel[]>([]);
+  useEffect(() => {
+    if (viewModalData?.length > 0) {
+      setFormData(viewModalData);
+    }
+    if (editModalData?.length > 0) {
+      setFormData(editModalData);
+    }
+  }, [viewModalData, editModalData]);
 
-  // useEffect(() => {
-  //   if (getLocalPrevData === true) {
-  //     getDataFromLocalStorage();
-  //   }
-  // }, [getLocalPrevData]);
-
-  // console.log(formData, "formData");
-  // console.log(persistFormData, "persistFormData");
-  // const getDataFromLocalStorage = () => {
-  //   let existingFormData: any;
-  //   const storedDataInLocal = localStorage.getItem("dynamicFormData");
-  //   console.log(storedDataInLocal, "storedDataInLocal");
-  //   if (storedDataInLocal !== null) {
-  //     existingFormData = JSON.parse(storedDataInLocal);
-  //   } else {
-  //     console.log("[}")
-  //     existingFormData = [];
-  //   }
-  //   console.log(existingFormData,"existingFormData")
-  //   setPersistFormData(existingFormData);
-  // };
   // dropdown type and input label onchange
   const handleTypeLabelOnChange = (event: any) => {
     const { value } = event.target;
@@ -84,7 +77,10 @@ const AddModal = ({
       type: "",
       label: "",
     });
+    setViewModalData([]);
+    setEditModalData([]);
     setFormData([]);
+    setViewDataIndex(0);
     setOpenAddModal(false);
   };
 
@@ -95,21 +91,57 @@ const AddModal = ({
       label: "",
     });
     setFormData([]);
+    setViewModalData([]);
+    setEditModalData([]);
+    setViewDataIndex(0);
   };
 
+  // const handleSubmit = () => {
+  //   if (allFormData?.length > 0) {
+  //     if (editModalData?.length > 0) {
+  //       let originalArray = allFormData;
+  //       originalArray.splice(viewDataIndex, 1, formData);
+  //       localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
+  //       alert("updated successfully");
+  //     } else {
+  //       let originalArray = allFormData;
+  //       originalArray.push(formData);
+  //       localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
+  //       alert("added successfully");
+  //     }
+  //   } else {
+  //     const data = [];
+  //     data.push(formData);
+  //     localStorage.setItem("dynamicFormData", JSON.stringify(data));
+  //     alert("added successfully");
+  //   }
+  //   setTypeAndLabelValue({
+  //     type: "",
+  //     label: "",
+  //   });
+  //   setFormData([]);
+  //   setViewModalData([]);
+  //   setEditModalData([]);
+  //   setViewDataIndex(0);
+  //   setOpenAddModal(false);
+  // };
+
   const handleSubmit = () => {
-    if (allFormData?.length > 0) {
-      let arr = [formData, allFormData];
-      localStorage.setItem("dynamicFormData", JSON.stringify(arr));
+    let originalArray = [...allFormData]; // Create a copy of allFormData to avoid mutating the state directly
+    if (editModalData?.length > 0) {
+      originalArray[viewDataIndex] = formData; // Update the formData at the specified index
+      alert("Updated successfully");
     } else {
-      console.log("else");
-      localStorage.setItem("dynamicFormData", JSON.stringify(formData));
+      originalArray.push(formData); // Add formData to the end of the array
+      alert("Added successfully");
     }
-    setTypeAndLabelValue({
-      type: "",
-      label: "",
-    });
+    localStorage.setItem("dynamicFormData", JSON.stringify(originalArray)); // Save the updated array to localStorage
+    // Reset states
+    setTypeAndLabelValue({ type: "", label: "" });
     setFormData([]);
+    setViewModalData([]);
+    setEditModalData([]);
+    setViewDataIndex(0);
     setOpenAddModal(false);
   };
 
@@ -118,20 +150,35 @@ const AddModal = ({
       <>
         <Box sx={classes.footerWrapperStyle}>
           <Box>
-            <Button variant="outlined" onClick={handleClose}>
+            <Button
+              variant="outlined"
+              onClick={handleClose}
+              disabled={viewModalData?.length > 0 ? true : false}
+            >
               Cancel
             </Button>
           </Box>
           <Box>
-            <Button variant="outlined" onClick={handleClear}>
+            <Button
+              variant="outlined"
+              onClick={handleClear}
+              disabled={viewModalData?.length > 0 ? true : false}
+            >
               Clear
             </Button>
           </Box>
+
           <Box>
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={formData?.length > 0 ? false : true}
+              disabled={
+                viewModalData?.length > 0
+                  ? true
+                  : formData?.length > 0
+                  ? false
+                  : true
+              }
             >
               Submit
             </Button>
@@ -145,7 +192,7 @@ const AddModal = ({
     const newData = [...formData];
     newData.splice(i, 1);
     setFormData(newData);
-    alert("Delete component succeesfully");
+    alert("Delete succeesfully");
   };
 
   const getDynamicField = () => {
@@ -181,6 +228,7 @@ const AddModal = ({
                           label={items.label}
                           type={items.type}
                           defaultValue={`Enter ${items.label}`}
+                          disabled={viewModalData?.length > 0 ? true : false}
                         />
                       </Grid>
                       <Grid
@@ -194,6 +242,7 @@ const AddModal = ({
                       >
                         <Button
                           variant="contained"
+                          disabled={viewModalData?.length > 0 ? true : false}
                           onClick={() => handleDeleteComponentMethod(index)}
                         >
                           Delete
@@ -225,6 +274,7 @@ const AddModal = ({
                           name={items.label}
                           label={items.label}
                           type={items.type}
+                          disabled={viewModalData?.length > 0 ? true : false}
                           defaultValue={`Enter ${items.label}`}
                         />
                       </Grid>
@@ -239,6 +289,7 @@ const AddModal = ({
                       >
                         <Button
                           variant="contained"
+                          disabled={viewModalData?.length > 0 ? true : false}
                           onClick={() => handleDeleteComponentMethod(index)}
                         >
                           Delete
@@ -263,7 +314,10 @@ const AddModal = ({
                         <Typography sx={{ textTransform: "capitalize" }} mb={1}>
                           {items.label}
                         </Typography>
-                        <Checkbox defaultChecked />
+                        <Checkbox
+                          defaultChecked
+                          disabled={viewModalData?.length > 0 ? true : false}
+                        />
                       </Grid>
                       <Grid
                         item
@@ -276,6 +330,7 @@ const AddModal = ({
                       >
                         <Button
                           variant="contained"
+                          disabled={viewModalData?.length > 0 ? true : false}
                           onClick={() => handleDeleteComponentMethod(index)}
                         >
                           Delete
@@ -309,6 +364,7 @@ const AddModal = ({
                             value="female"
                             control={<Radio />}
                             label={items.label}
+                            disabled={viewModalData?.length > 0 ? true : false}
                           />
                         </RadioGroup>
                       </Grid>
@@ -323,6 +379,7 @@ const AddModal = ({
                       >
                         <Button
                           variant="contained"
+                          disabled={viewModalData?.length > 0 ? true : false}
                           onClick={() => handleDeleteComponentMethod(index)}
                         >
                           Delete
@@ -352,6 +409,7 @@ const AddModal = ({
                 <Select
                   id="type"
                   name="type"
+                  disabled={viewModalData?.length > 0 ? true : false}
                   value={typeAndLabelValue.type}
                   label="Select Type"
                   onChange={handleTypeLabelOnChange}
@@ -378,6 +436,7 @@ const AddModal = ({
                 style={{ width: "100%" }}
                 id="label"
                 name="label"
+                disabled={viewModalData?.length > 0 ? true : false}
                 value={typeAndLabelValue.label}
                 label="Label"
                 defaultValue="Enter Lable"
@@ -385,7 +444,11 @@ const AddModal = ({
               />
             </Grid>
             <Grid item xl={1} lg={1} md={1} sm={12} xs={12}>
-              <Button variant="contained" onClick={handleAddComponent}>
+              <Button
+                variant="contained"
+                onClick={handleAddComponent}
+                disabled={viewModalData?.length > 0 ? true : false}
+              >
                 Add Component
               </Button>
             </Grid>

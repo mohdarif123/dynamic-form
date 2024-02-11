@@ -11,96 +11,105 @@ const Home = () => {
   const classes = Homestyle;
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-  const [getLocalPrevData, setGetLocalPrevData] = useState<boolean>(false);
+  const [deletedIndex, setDeletedIndex] = useState<number>(0);
+  const [viewDataIndex, setViewDataIndex] = useState<number>(0);
   const [allFormData, setAllFormData] = useState<any>([]);
+  const [viewModalData, setViewModalData] = useState<any>([]);
+  const [editModalData, setEditModalData] = useState<any>([]);
 
-  // useEffect(() => {
-  //   let persistFormData: any;
-  //   const dataInLocal = localStorage.getItem("dynamicFormData");
-  //   if (dataInLocal !== null) {
-  //     persistFormData = JSON.parse(dataInLocal);
-  //   }
-  //   setAllFormData(persistFormData);
-  //   console.log("testing");
-  // }, []);
+  useEffect(() => {
+    existingFormAllDataHandler();
+  }, []);
 
-  const addModalHandler = () => {
+  const existingFormAllDataHandler = () => {
     let existingFormData: any;
-    setOpenAddModal(true);
     const storedDataInLocal = localStorage.getItem("dynamicFormData");
     if (storedDataInLocal !== null) {
       existingFormData = JSON.parse(storedDataInLocal);
     } else {
       existingFormData = [];
     }
-    if (existingFormData?.length > 0) {
-      setGetLocalPrevData(true);
-    }
     setAllFormData(existingFormData);
-    console.log(existingFormData, "existingFormData");
   };
-  console.log(allFormData, "allFormData");
-  const handleEditMethod = () => {
+
+  const addModalHandler = () => {
     setOpenAddModal(true);
   };
 
-  const handleViewMethod = () => {
+  const handleEditMethod = (edit: any, i: number) => {
     setOpenAddModal(true);
+    setEditModalData(edit);
+    setViewDataIndex(i);
   };
 
-  const deleteHandler = () => {
+  const handleViewMethod = (data: any) => {
+    setOpenAddModal(true);
+    setViewModalData(data);
+  };
+
+  const deleteHandler = (index: number) => {
     setOpenDeleteModal(true);
+    setDeletedIndex(index);
   };
 
-  const deleteFunction = () => {
-    alert("dlete");
+  const finalDeleteHandler = () => {
+    const updateFormData = [...allFormData];
+    updateFormData.splice(deletedIndex, 1);
+    setAllFormData(updateFormData);
     setOpenDeleteModal(false);
+    localStorage.setItem("dynamicFormData", JSON.stringify(updateFormData));
+    alert("Delete succeesfully");
   };
 
   const showAllModalData = () => {
     return (
       <>
-        <Grid container sx={classes.showAllDataWrapper}>
-          <Grid xl={1.5} lg={1.5}>
-            <Typography>Name</Typography>
-          </Grid>
-          <Grid xl={1.5} lg={1.5}>
-            <Typography>class</Typography>
-          </Grid>
-          <Grid xl={1.5} lg={1.5}>
-            <Typography>course</Typography>
-          </Grid>
-          <Grid xl={1.5} lg={1.5}>
-            <Typography>data</Typography>
-          </Grid>
-          <Grid xl={1.5} lg={1.5}>
-            <Typography>address</Typography>
-          </Grid>
-          <Grid xl={2.5} lg={2.5}>
-            <Box
+        <Grid container sx={classes.showAllDataWrapper} spacing={2}>
+          {allFormData.map((innerArray: any[], index: number) => (
+            <Grid
+              item
+              xs={12}
+              key={index}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
+                background: "skyblue",
+                padding: "10px 10px",
+                marginY: "10px",
               }}
             >
-              <ModeEditIcon
-                sx={{ cursor: "pointer" }}
-                onClick={handleEditMethod}
-              />
-              <VisibilityIcon
-                sx={{ cursor: "pointer" }}
-                onClick={handleViewMethod}
-              />
-              <DeleteOutlineIcon
-                sx={{ cursor: "pointer" }}
-                onClick={deleteHandler}
-              />
-              <Button variant="contained" sx={{ margin: "4px 0 4px 0" }}>
-                Enalble
-              </Button>
-            </Box>
-          </Grid>
+              <Box>
+                {innerArray.map((item: any, innerIndex: number) => (
+                  <Box key={innerIndex}>
+                    <Typography variant="h5">
+                      Type: {item.type}, Label: {item.label}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {" "}
+                <ModeEditIcon
+                  sx={{ cursor: "pointer", marginRight: "20px" }}
+                  onClick={() => handleEditMethod(innerArray, index)}
+                />
+                <VisibilityIcon
+                  sx={{ cursor: "pointer", marginRight: "20px" }}
+                  onClick={() => handleViewMethod(innerArray)}
+                />
+                <DeleteOutlineIcon
+                  style={{ cursor: "pointer", marginRight: "20px" }}
+                  onClick={() => deleteHandler(index)}
+                />
+                <Button variant="contained">Enalble</Button>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
       </>
     );
@@ -131,16 +140,19 @@ const Home = () => {
         <AddModal
           openAddModal={openAddModal}
           setOpenAddModal={setOpenAddModal}
-          setGetLocalPrevData={setGetLocalPrevData}
-          getLocalPrevData={getLocalPrevData}
-          setAllFormData={setAllFormData}
           allFormData={allFormData}
+          viewModalData={viewModalData}
+          setViewModalData={setViewModalData}
+          setEditModalData={setEditModalData}
+          editModalData={editModalData}
+          viewDataIndex={viewDataIndex}
+          setViewDataIndex={setViewDataIndex}
         />
         {/* delete modal  */}
         <DeleteModal
           openDeleteModal={openDeleteModal}
           setOpenDeleteModal={setOpenDeleteModal}
-          deleteFunction={deleteFunction}
+          deleteFunction={finalDeleteHandler}
         />
       </>
     );

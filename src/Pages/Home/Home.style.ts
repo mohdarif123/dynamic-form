@@ -4,8 +4,6 @@ export const Homestyle = {
     justifyContent: "space-between",
     mt: 4,
     px: 4,
-    background:"#000",
-    color:"#ffffff"
   },
   addButtonWrapperStyle: {
     display: "flex",
