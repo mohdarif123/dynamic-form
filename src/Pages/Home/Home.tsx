@@ -58,14 +58,15 @@ const Home = () => {
     setAllFormData(updateFormData);
     setOpenDeleteModal(false);
     localStorage.setItem("dynamicFormData", JSON.stringify(updateFormData));
-    alert("Delete succeesfully");
+    alert("Delete successfully");
   };
 
+  console.log(allFormData, "allFormData");
   const showAllModalData = () => {
     return (
       <>
         <Grid container sx={classes.showAllDataWrapper} spacing={2}>
-          {allFormData.map((innerArray: any[], index: number) => (
+          {allFormData.map((innerArray: any, index: number) => (
             <Grid
               item
               xs={12}
@@ -79,7 +80,7 @@ const Home = () => {
               }}
             >
               <Box>
-                {innerArray.map((item: any, innerIndex: number) => (
+                {innerArray?.map((item: any, innerIndex: number) => (
                   <Box key={innerIndex}>
                     <Typography variant="h5">
                       Type: {item.type}, Label: {item.label}
@@ -106,10 +107,16 @@ const Home = () => {
                   style={{ cursor: "pointer", marginRight: "20px" }}
                   onClick={() => deleteHandler(index)}
                 />
-                <Button variant="contained">Enalble</Button>
+                <Button variant="contained">Enable</Button>
               </Box>
             </Grid>
           ))}
+
+          {allFormData?.length === 0 && (
+            <Box>
+              <Typography variant="h1">No data found</Typography>
+            </Box>
+          )}
         </Grid>
       </>
     );

@@ -40,11 +40,12 @@ const AddModal = ({
   setViewDataIndex,
 }: CustomProps) => {
   const classes = ModalStyle;
-  const [typeAndLabelValue, setTypeAndLabelValue] = useState<TypeAndLabel>({
+  const [typeAndLabelValue, setTypeAndLabelValue] = useState<any>({
     type: "",
     label: "",
   });
-  const [formData, setFormData] = useState<TypeAndLabel[]>([]);
+  const [textValue, setTextValue] = useState("");
+  const [formData, setFormData] = useState<any[]>([]);
   useEffect(() => {
     if (viewModalData?.length > 0) {
       setFormData(viewModalData);
@@ -57,7 +58,7 @@ const AddModal = ({
   // dropdown type and input label onchange
   const handleTypeLabelOnChange = (event: any) => {
     const { value } = event.target;
-    setTypeAndLabelValue((prevState) => ({
+    setTypeAndLabelValue((prevState: any) => ({
       ...prevState,
       [event.target.name]: value,
     }));
@@ -95,49 +96,29 @@ const AddModal = ({
     setEditModalData([]);
     setViewDataIndex(0);
   };
-
-  // const handleSubmit = () => {
-  //   if (allFormData?.length > 0) {
-  //     if (editModalData?.length > 0) {
-  //       let originalArray = allFormData;
-  //       originalArray.splice(viewDataIndex, 1, formData);
-  //       localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
-  //       alert("updated successfully");
-  //     } else {
-  //       let originalArray = allFormData;
-  //       originalArray.push(formData);
-  //       localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
-  //       alert("added successfully");
-  //     }
-  //   } else {
-  //     const data = [];
-  //     data.push(formData);
-  //     localStorage.setItem("dynamicFormData", JSON.stringify(data));
-  //     alert("added successfully");
-  //   }
-  //   setTypeAndLabelValue({
-  //     type: "",
-  //     label: "",
-  //   });
-  //   setFormData([]);
-  //   setViewModalData([]);
-  //   setEditModalData([]);
-  //   setViewDataIndex(0);
-  //   setOpenAddModal(false);
-  // };
-// sdfsdf
   const handleSubmit = () => {
-    let originalArray = [...allFormData]; // Create a copy of allFormData to avoid mutating the state directly
-    if (editModalData?.length > 0) {
-      originalArray[viewDataIndex] = formData; // Update the formData at the specified index
-      alert("Updated successfully");
+    if (allFormData?.length > 0) {
+      if (editModalData?.length > 0) {
+        let originalArray = allFormData;
+        originalArray.splice(viewDataIndex, 1, formData);
+        localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
+        alert("updated successfully");
+      } else {
+        let originalArray = allFormData;
+        originalArray.push(formData);
+        localStorage.setItem("dynamicFormData", JSON.stringify(originalArray));
+        alert("added successfully");
+      }
     } else {
-      originalArray.push(formData); // Add formData to the end of the array
-      alert("Added successfully");
+      const data = [];
+      data.push(formData);
+      localStorage.setItem("dynamicFormData", JSON.stringify(data));
+      alert("added successfully");
     }
-    localStorage.setItem("dynamicFormData", JSON.stringify(originalArray)); // Save the updated array to localStorage
-    // Reset states
-    setTypeAndLabelValue({ type: "", label: "" });
+    setTypeAndLabelValue({
+      type: "",
+      label: "",
+    });
     setFormData([]);
     setViewModalData([]);
     setEditModalData([]);
@@ -192,7 +173,17 @@ const AddModal = ({
     const newData = [...formData];
     newData.splice(i, 1);
     setFormData(newData);
-    alert("Delete succeesfully");
+    alert("Delete successfully");
+  };
+
+  const handleOnTextMethod = (event: React.ChangeEvent<any>, index: number) => {
+    const { value } = event.target;
+    const updatedFormData = formData;
+    updatedFormData[index] = {
+      ...updatedFormData[index],
+      value: value,
+    };
+    setFormData(updatedFormData);
   };
 
   const getDynamicField = () => {
@@ -226,8 +217,9 @@ const AddModal = ({
                           id={items.label}
                           name={items.label}
                           label={items.label}
-                          type={items.type}
-                          defaultValue={`Enter ${items.label}`}
+                          type={"text"}
+                          onChange={(event) => handleOnTextMethod(event, index)}
+                          placeholder="Enter text"
                           disabled={viewModalData?.length > 0 ? true : false}
                         />
                       </Grid>
