@@ -176,6 +176,32 @@ const AddModal = ({
     alert("Delete successfully");
   };
 
+  const handleOnCheckboxMethod = (
+    event: React.ChangeEvent<any>,
+    index: number
+  ) => {
+    const { checked } = event.target;
+    const updatedFormData = formData;
+    updatedFormData[index] = {
+      ...updatedFormData[index],
+      checkbox: checked,
+    };
+    setFormData(updatedFormData);
+  };
+
+  const handleOnRadioMethod = (
+    event: React.ChangeEvent<any>,
+    index: number
+  ) => {
+    const { value } = event.target;
+    const updatedFormData = formData;
+    updatedFormData[index] = {
+      ...updatedFormData[index],
+      radioValue: value,
+    };
+    setFormData(updatedFormData);
+  };
+
   const handleOnTextMethod = (event: React.ChangeEvent<any>, index: number) => {
     const { value } = event.target;
     const updatedFormData = formData;
@@ -217,6 +243,7 @@ const AddModal = ({
                           id={items.label}
                           name={items.label}
                           label={items.label}
+                          value={items.value}
                           type={"text"}
                           onChange={(event) => handleOnTextMethod(event, index)}
                           placeholder="Enter text"
@@ -265,6 +292,8 @@ const AddModal = ({
                           id={items.label}
                           name={items.label}
                           label={items.label}
+                          value={items.value}
+                          onChange={(event) => handleOnTextMethod(event, index)}
                           type={items.type}
                           disabled={viewModalData?.length > 0 ? true : false}
                           defaultValue={`Enter ${items.label}`}
@@ -307,8 +336,11 @@ const AddModal = ({
                           {items.label}
                         </Typography>
                         <Checkbox
-                          defaultChecked
+                          checked={items.checkbox}
                           disabled={viewModalData?.length > 0 ? true : false}
+                          onChange={(event) =>
+                            handleOnCheckboxMethod(event, index)
+                          }
                         />
                       </Grid>
                       <Grid
@@ -349,14 +381,17 @@ const AddModal = ({
                         </Typography>
                         <RadioGroup
                           aria-labelledby="demo-radio-buttons-group-label"
-                          defaultValue="female"
                           name="radio-buttons-group"
                         >
                           <FormControlLabel
-                            value="female"
+                            value={items.radioValue}
                             control={<Radio />}
+                            name="radioValue"
                             label={items.label}
                             disabled={viewModalData?.length > 0 ? true : false}
+                            onChange={(event) =>
+                              handleOnRadioMethod(event, index)
+                            }
                           />
                         </RadioGroup>
                       </Grid>
