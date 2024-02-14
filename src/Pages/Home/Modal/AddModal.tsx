@@ -4,15 +4,12 @@ import Modal from "@mui/material/Modal";
 import { ModalStyle } from "./Modal.style";
 import CloseIcon from "@mui/icons-material/Close";
 import InputLabel from "@mui/material/InputLabel";
-import Alert from "@mui/material/Alert";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { TypeAndLabel } from "./modalValidation";
 
@@ -186,7 +183,7 @@ const AddModal = ({
       ...updatedFormData[index],
       checkbox: checked,
     };
-    setFormData(updatedFormData);
+    setFormData([...updatedFormData]);
   };
 
   const handleOnRadioMethod = (
@@ -194,6 +191,7 @@ const AddModal = ({
     index: number
   ) => {
     const { value } = event.target;
+    console.log(value, "value");
     const updatedFormData = formData;
     updatedFormData[index] = {
       ...updatedFormData[index],
@@ -209,7 +207,7 @@ const AddModal = ({
       ...updatedFormData[index],
       value: value,
     };
-    setFormData(updatedFormData);
+    setFormData([...updatedFormData]);
   };
 
   const getDynamicField = () => {
@@ -287,13 +285,16 @@ const AddModal = ({
                         </Typography>
                         <TextField
                           required
+                          multiline
                           style={{ width: "100%" }}
                           rows={4}
                           id={items.label}
                           name={items.label}
                           label={items.label}
                           value={items.value}
-                          onChange={(event) => handleOnTextMethod(event, index)}
+                          onChange={(event: any) =>
+                            handleOnTextMethod(event, index)
+                          }
                           type={items.type}
                           disabled={viewModalData?.length > 0 ? true : false}
                           defaultValue={`Enter ${items.label}`}
@@ -380,19 +381,24 @@ const AddModal = ({
                           {items.label}
                         </Typography>
                         <RadioGroup
-                          aria-labelledby="demo-radio-buttons-group-label"
-                          name="radio-buttons-group"
+                          onChange={(event: any) =>
+                            handleOnRadioMethod(event, index)
+                          }
+                          value={items.radioValue}
                         >
-                          <FormControlLabel
-                            value={items.radioValue}
-                            control={<Radio />}
-                            name="radioValue"
-                            label={items.label}
-                            disabled={viewModalData?.length > 0 ? true : false}
-                            onChange={(event) =>
-                              handleOnRadioMethod(event, index)
-                            }
-                          />
+                          {["male", "female", "other"].map((items: any) => {
+                            return (
+                              <FormControlLabel
+                                value={items}
+                                control={<Radio />}
+                                label={items}
+                                style={{ textTransform: "capitalize" }}
+                                disabled={
+                                  viewModalData?.length > 0 ? true : false
+                                }
+                              />
+                            );
+                          })}
                         </RadioGroup>
                       </Grid>
                       <Grid

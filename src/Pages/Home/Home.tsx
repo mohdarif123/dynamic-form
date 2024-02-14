@@ -61,7 +61,6 @@ const Home = () => {
     alert("Delete successfully");
   };
 
-  console.log(allFormData, "allFormData");
   const showAllModalData = () => {
     return (
       <>
@@ -83,7 +82,13 @@ const Home = () => {
                 {innerArray?.map((item: any, innerIndex: number) => (
                   <Box key={innerIndex}>
                     <Typography variant="h5">
-                      Type: {item.type}, Label: {item.label}
+                      {item.checkbox && `Checkbox : ${item.checkbox}`}
+                    </Typography>
+                    <Typography variant="h5">
+                      {item.radioValue && `Radio : ${item.radioValue}`}
+                    </Typography>
+                    <Typography variant="h5">
+                      {item.value && `value : ${item.value}`}
                     </Typography>
                   </Box>
                 ))}
